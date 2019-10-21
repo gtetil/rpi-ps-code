@@ -3,39 +3,39 @@ rpi-ps-code.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         000000b8  00000000  00000000  00000074  2**1
+  0 .text         00000132  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         00000000  00800060  00800060  0000012c  2**0
+  1 .data         00000000  00800060  00800060  000001a6  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  2 .bss          00000002  00800060  00800060  0000012c  2**0
+  2 .bss          00000001  00800060  00800060  000001a6  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  0000012c  2**0
+  3 .comment      00000030  00000000  00000000  000001a6  2**0
                   CONTENTS, READONLY
-  4 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  0000015c  2**2
+  4 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000001d8  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 00000038  00000000  00000000  00000198  2**0
+  5 .debug_aranges 00000040  00000000  00000000  00000214  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   00000540  00000000  00000000  000001d0  2**0
+  6 .debug_info   0000060a  00000000  00000000  00000254  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 000004a1  00000000  00000000  00000710  2**0
+  7 .debug_abbrev 0000051a  00000000  00000000  0000085e  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00000266  00000000  00000000  00000bb1  2**0
+  8 .debug_line   000002f6  00000000  00000000  00000d78  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  00000074  00000000  00000000  00000e18  2**2
+  9 .debug_frame  000000c8  00000000  00000000  00001070  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00000332  00000000  00000000  00000e8c  2**0
+ 10 .debug_str    00000388  00000000  00000000  00001138  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00000078  00000000  00000000  000011be  2**0
+ 11 .debug_loc    00000169  00000000  00000000  000014c0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000028  00000000  00000000  00001236  2**0
+ 12 .debug_ranges 00000030  00000000  00000000  00001629  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
 
 00000000 <__vectors>:
    0:	0e c0       	rjmp	.+28     	; 0x1e <__ctors_end>
-   2:	1d c0       	rjmp	.+58     	; 0x3e <__bad_interrupt>
-   4:	1d c0       	rjmp	.+58     	; 0x40 <__vector_2>
+   2:	56 c0       	rjmp	.+172    	; 0xb0 <__vector_1>
+   4:	31 c0       	rjmp	.+98     	; 0x68 <__vector_2>
    6:	1b c0       	rjmp	.+54     	; 0x3e <__bad_interrupt>
    8:	1a c0       	rjmp	.+52     	; 0x3e <__bad_interrupt>
    a:	19 c0       	rjmp	.+50     	; 0x3e <__bad_interrupt>
@@ -67,116 +67,212 @@ Disassembly of section .text:
   32:	1d 92       	st	X+, r1
 
 00000034 <.do_clear_bss_start>:
-  34:	a2 36       	cpi	r26, 0x62	; 98
+  34:	a1 36       	cpi	r26, 0x61	; 97
   36:	b2 07       	cpc	r27, r18
   38:	e1 f7       	brne	.-8      	; 0x32 <.do_clear_bss_loop>
-  3a:	1e d0       	rcall	.+60     	; 0x78 <main>
-  3c:	3b c0       	rjmp	.+118    	; 0xb4 <_exit>
+  3a:	73 d0       	rcall	.+230    	; 0x122 <main>
+  3c:	78 c0       	rjmp	.+240    	; 0x12e <_exit>
 
 0000003e <__bad_interrupt>:
   3e:	e0 cf       	rjmp	.-64     	; 0x0 <__vectors>
 
-00000040 <__vector_2>:
+00000040 <_Z5sleepv>:
+uint8_t ignition_state = 0;
+uint8_t sleep_flag = 0;
+
+void sleep(void) {
+	
+	cli(); // Disable interrupts
+  40:	f8 94       	cli
+	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  42:	85 b7       	in	r24, 0x35	; 53
+  44:	87 7e       	andi	r24, 0xE7	; 231
+  46:	80 61       	ori	r24, 0x10	; 16
+  48:	85 bf       	out	0x35, r24	; 53
+	sleep_enable();
+  4a:	85 b7       	in	r24, 0x35	; 53
+  4c:	80 62       	ori	r24, 0x20	; 32
+  4e:	85 bf       	out	0x35, r24	; 53
+	sleep_bod_disable();
+  50:	85 b7       	in	r24, 0x35	; 53
+  52:	84 68       	ori	r24, 0x84	; 132
+  54:	85 bf       	out	0x35, r24	; 53
+  56:	8b 7f       	andi	r24, 0xFB	; 251
+  58:	85 bf       	out	0x35, r24	; 53
+	sei();
+  5a:	78 94       	sei
+	sleep_cpu();
+  5c:	88 95       	sleep
+	// the AVR now sleeps until IGN_INPUT turns on...
+	sleep_disable();
+  5e:	85 b7       	in	r24, 0x35	; 53
+  60:	8f 7d       	andi	r24, 0xDF	; 223
+  62:	85 bf       	out	0x35, r24	; 53
+	sei(); // enable interrupts
+  64:	78 94       	sei
+  66:	08 95       	ret
+
+00000068 <__vector_2>:
+	
+}
+
+ISR(PCINT0_vect) {  // IGN_INPUT vector
+  68:	1f 92       	push	r1
+  6a:	0f 92       	push	r0
+  6c:	0f b6       	in	r0, 0x3f	; 63
+  6e:	0f 92       	push	r0
+  70:	11 24       	eor	r1, r1
+  72:	2f 93       	push	r18
+  74:	8f 93       	push	r24
+  76:	9f 93       	push	r25
+	
+	if (bit_is_clear(DI_PIN, IGN_INPUT)) {  // check if IGN_INPUT is ON (this input is reverse logic)
+  78:	b0 99       	sbic	0x16, 0	; 22
+  7a:	10 c0       	rjmp	.+32     	; 0x9c <__vector_2+0x34>
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+  7c:	2f e9       	ldi	r18, 0x9F	; 159
+  7e:	86 e8       	ldi	r24, 0x86	; 134
+  80:	91 e0       	ldi	r25, 0x01	; 1
+  82:	21 50       	subi	r18, 0x01	; 1
+  84:	80 40       	sbci	r24, 0x00	; 0
+  86:	90 40       	sbci	r25, 0x00	; 0
+  88:	e1 f7       	brne	.-8      	; 0x82 <__vector_2+0x1a>
+  8a:	00 c0       	rjmp	.+0      	; 0x8c <__vector_2+0x24>
+  8c:	00 00       	nop
+		_delay_ms(500);  // debounce
+		if (bit_is_clear(DI_PIN, IGN_INPUT)) {
+  8e:	b0 99       	sbic	0x16, 0	; 22
+  90:	07 c0       	rjmp	.+14     	; 0xa0 <__vector_2+0x38>
+			ignition_state = 1;
+  92:	81 e0       	ldi	r24, 0x01	; 1
+  94:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <_edata>
+			DO_PORT |= (1 << PWR_ON_OUTPUT);  // turn on PWR_ON_OUTPUT (enables power supply to RPi)
+  98:	c1 9a       	sbi	0x18, 1	; 24
+  9a:	02 c0       	rjmp	.+4      	; 0xa0 <__vector_2+0x38>
+		}
+	}
+	else {
+		ignition_state = 0;
+  9c:	10 92 60 00 	sts	0x0060, r1	; 0x800060 <_edata>
+	}
+	
+}
+  a0:	9f 91       	pop	r25
+  a2:	8f 91       	pop	r24
+  a4:	2f 91       	pop	r18
+  a6:	0f 90       	pop	r0
+  a8:	0f be       	out	0x3f, r0	; 63
+  aa:	0f 90       	pop	r0
+  ac:	1f 90       	pop	r1
+  ae:	18 95       	reti
+
+000000b0 <__vector_1>:
+
+ISR(INT0_vect) {  // RPI_INPUT vector
+  b0:	1f 92       	push	r1
+  b2:	0f 92       	push	r0
+  b4:	0f b6       	in	r0, 0x3f	; 63
+  b6:	0f 92       	push	r0
+  b8:	11 24       	eor	r1, r1
+  ba:	2f 93       	push	r18
+  bc:	3f 93       	push	r19
+  be:	4f 93       	push	r20
+  c0:	5f 93       	push	r21
+  c2:	6f 93       	push	r22
+  c4:	7f 93       	push	r23
+  c6:	8f 93       	push	r24
+  c8:	9f 93       	push	r25
+  ca:	af 93       	push	r26
+  cc:	bf 93       	push	r27
+  ce:	ef 93       	push	r30
+  d0:	ff 93       	push	r31
+	
+	if (bit_is_set(DI_PIN, RPI_INPUT)) {  // check in RPI_INPUT is OFF	
+  d2:	b2 9b       	sbis	0x16, 2	; 22
+  d4:	06 c0       	rjmp	.+12     	; 0xe2 <__vector_1+0x32>
+		if (ignition_state == 0) {
+  d6:	80 91 60 00 	lds	r24, 0x0060	; 0x800060 <_edata>
+  da:	81 11       	cpse	r24, r1
+  dc:	02 c0       	rjmp	.+4      	; 0xe2 <__vector_1+0x32>
 			DO_PORT &= ~(1 << PWR_ON_OUTPUT);  // turn off PWR_ON_OUTPUT (disables power supply to RPi)
-			sleep_flag = 1;
+  de:	c1 98       	cbi	0x18, 1	; 24
+			sleep();			
+  e0:	af df       	rcall	.-162    	; 0x40 <_Z5sleepv>
 		}
 	}
 	
 }
-  40:	1f 92       	push	r1
-  42:	0f 92       	push	r0
-  44:	0f b6       	in	r0, 0x3f	; 63
-  46:	0f 92       	push	r0
-  48:	11 24       	eor	r1, r1
-  4a:	8f 93       	push	r24
-  4c:	b0 99       	sbic	0x16, 0	; 22
-  4e:	05 c0       	rjmp	.+10     	; 0x5a <__vector_2+0x1a>
-  50:	81 e0       	ldi	r24, 0x01	; 1
-  52:	80 93 61 00 	sts	0x0061, r24	; 0x800061 <ignition_state>
-  56:	c1 9a       	sbi	0x18, 1	; 24
-  58:	02 c0       	rjmp	.+4      	; 0x5e <__vector_2+0x1e>
-  5a:	10 92 61 00 	sts	0x0061, r1	; 0x800061 <ignition_state>
-  5e:	8f 91       	pop	r24
-  60:	0f 90       	pop	r0
-  62:	0f be       	out	0x3f, r0	; 63
-  64:	0f 90       	pop	r0
-  66:	1f 90       	pop	r1
-  68:	18 95       	reti
+  e2:	ff 91       	pop	r31
+  e4:	ef 91       	pop	r30
+  e6:	bf 91       	pop	r27
+  e8:	af 91       	pop	r26
+  ea:	9f 91       	pop	r25
+  ec:	8f 91       	pop	r24
+  ee:	7f 91       	pop	r23
+  f0:	6f 91       	pop	r22
+  f2:	5f 91       	pop	r21
+  f4:	4f 91       	pop	r20
+  f6:	3f 91       	pop	r19
+  f8:	2f 91       	pop	r18
+  fa:	0f 90       	pop	r0
+  fc:	0f be       	out	0x3f, r0	; 63
+  fe:	0f 90       	pop	r0
+ 100:	1f 90       	pop	r1
+ 102:	18 95       	reti
 
-0000006a <_Z16initPCinterruptsv>:
+00000104 <_Z14initInterruptsv>:
 
-void initPCinterrupts(void) {
+void initInterrupts(void) {
 	
 	GIMSK |= (1 << PCIE);   // pin change interrupt enable
-  6a:	8b b7       	in	r24, 0x3b	; 59
-  6c:	80 62       	ori	r24, 0x20	; 32
-  6e:	8b bf       	out	0x3b, r24	; 59
+ 104:	8b b7       	in	r24, 0x3b	; 59
+ 106:	80 62       	ori	r24, 0x20	; 32
+ 108:	8b bf       	out	0x3b, r24	; 59
+	GIMSK |= (1 << INT0);   // pin change interrupt enable
+ 10a:	8b b7       	in	r24, 0x3b	; 59
+ 10c:	80 64       	ori	r24, 0x40	; 64
+ 10e:	8b bf       	out	0x3b, r24	; 59
 	PCMSK |= (1 << PCINT0); // pin change interrupt enabled for IGN_INPUT (PCINT0)
-  70:	a8 9a       	sbi	0x15, 0	; 21
-	PCMSK |= (1 << PCINT2); // pin change interrupt enabled for RPI_INPUT (PCINT2)
-  72:	aa 9a       	sbi	0x15, 2	; 21
+ 110:	a8 9a       	sbi	0x15, 0	; 21
+	MCUCR |= (1 << ISC00);  // set for falling edge
+ 112:	85 b7       	in	r24, 0x35	; 53
+ 114:	81 60       	ori	r24, 0x01	; 1
+ 116:	85 bf       	out	0x35, r24	; 53
+	MCUCR |= (1 << ISC01);  // set for falling edge
+ 118:	85 b7       	in	r24, 0x35	; 53
+ 11a:	82 60       	ori	r24, 0x02	; 2
+ 11c:	85 bf       	out	0x35, r24	; 53
 	sei();                  // enable interrupts
-  74:	78 94       	sei
-  76:	08 95       	ret
+ 11e:	78 94       	sei
+ 120:	08 95       	ret
 
-00000078 <main>:
+00000122 <main>:
 }
 
 int main(void)
 {
 	// -------- Inits --------- //
 	DI_PORT_DDR &= ~(1 << IGN_PIN);  // set IGN_INPUT pin as input
-  78:	b8 98       	cbi	0x17, 0	; 23
+ 122:	b8 98       	cbi	0x17, 0	; 23
 	DI_PORT_DDR &= ~(1 << RPI_PIN);  // set RPI_INPUT pin as input
-  7a:	ba 98       	cbi	0x17, 2	; 23
+ 124:	ba 98       	cbi	0x17, 2	; 23
 	
 	DO_PORT_DDR |= (1 << PWR_ON_OUTPUT);  // set PWR_ON_OUTPUT pin as output
-  7c:	b9 9a       	sbi	0x17, 1	; 23
+ 126:	b9 9a       	sbi	0x17, 1	; 23
 	
-	initPCinterrupts();
-  7e:	f5 df       	rcall	.-22     	; 0x6a <_Z16initPCinterruptsv>
-	
-    while (1) {
-		
-		if (sleep_flag) {
-  80:	80 91 60 00 	lds	r24, 0x0060	; 0x800060 <_edata>
-  84:	88 23       	and	r24, r24
-  86:	f1 f3       	breq	.-4      	; 0x84 <main+0xc>
-			
-			sleep_flag = 0;
-  88:	10 92 60 00 	sts	0x0060, r1	; 0x800060 <_edata>
-			cli(); // Disable interrupts
-  8c:	f8 94       	cli
-			set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-  8e:	85 b7       	in	r24, 0x35	; 53
-  90:	87 7e       	andi	r24, 0xE7	; 231
-  92:	80 61       	ori	r24, 0x10	; 16
-  94:	85 bf       	out	0x35, r24	; 53
-			sleep_enable();
-  96:	85 b7       	in	r24, 0x35	; 53
-  98:	80 62       	ori	r24, 0x20	; 32
-  9a:	85 bf       	out	0x35, r24	; 53
-			sleep_bod_disable();
-  9c:	85 b7       	in	r24, 0x35	; 53
-  9e:	84 68       	ori	r24, 0x84	; 132
-  a0:	85 bf       	out	0x35, r24	; 53
-  a2:	8b 7f       	andi	r24, 0xFB	; 251
-  a4:	85 bf       	out	0x35, r24	; 53
-			sei();
-  a6:	78 94       	sei
-			sleep_cpu();
-  a8:	88 95       	sleep
-			// the AVR now sleeps until IGN_INPUT turns on...
-			sleep_disable();
-  aa:	85 b7       	in	r24, 0x35	; 53
-  ac:	8f 7d       	andi	r24, 0xDF	; 223
-  ae:	85 bf       	out	0x35, r24	; 53
-			sei(); // enable interrupts
-  b0:	78 94       	sei
-  b2:	e6 cf       	rjmp	.-52     	; 0x80 <main+0x8>
+	initInterrupts();
+ 128:	ed df       	rcall	.-38     	; 0x104 <_Z14initInterruptsv>
+	sleep();  // put to sleep right away
+ 12a:	8a df       	rcall	.-236    	; 0x40 <_Z5sleepv>
+ 12c:	ff cf       	rjmp	.-2      	; 0x12c <main+0xa>
 
-000000b4 <_exit>:
-  b4:	f8 94       	cli
+0000012e <_exit>:
+ 12e:	f8 94       	cli
 
-000000b6 <__stop_program>:
-  b6:	ff cf       	rjmp	.-2      	; 0xb6 <__stop_program>
+00000130 <__stop_program>:
+ 130:	ff cf       	rjmp	.-2      	; 0x130 <__stop_program>
